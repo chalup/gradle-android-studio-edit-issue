@@ -1,0 +1,38 @@
+import net.ltgt.gradle.errorprone.ErrorProneToolChain
+
+apply plugin: 'com.android.application'
+apply plugin: "net.ltgt.errorprone-base"
+
+configurations.errorprone.resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.5'
+
+android {
+  compileSdkVersion 23
+  buildToolsVersion "23.0.2"
+
+  defaultConfig {
+    applicationId "org.chalup.gradleeditfail"
+    minSdkVersion 15
+    targetSdkVersion 23
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+}
+
+dependencies {
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  testCompile 'junit:junit:4.12'
+  compile 'com.android.support:appcompat-v7:23.1.1'
+}
+
+afterEvaluate {
+  android.applicationVariants.each {
+    it.javaCompile.toolChain ErrorProneToolChain.create(project)
+    it.javaCompile.options.compilerArgs.addAll()
+  }
+}
